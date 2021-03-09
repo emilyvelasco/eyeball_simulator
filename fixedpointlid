@@ -1,0 +1,20 @@
+// make a mask for the open percentage of the eye
+void make_lid_mask(PBM& image, int percent_open)
+{
+  const uint16_t q = 1024;
+  uint32_t lid_r = q * 11;
+  uint32_t s = (q*100/(percent_open+1))*(q*100/(percent_open+1));
+  for (char row=0; row<image.rows; row++){
+    for (char col=0; col<image.cols; col++){
+      uint32_t r = (s*(row - float(image.rows)/2+0.5) *
+                    (row - float(image.rows)/2+0.5) +
+                    (col - float(image.cols)/2+0.5) *
+                    (col - float(image.cols)/2+0.5));
+      if (r > lid_r*lid_r){
+        image.set_pixel(row, col, 0);
+      } else {
+        image.set_pixel(row, col, 1);
+      }
+    }
+  }
+}
