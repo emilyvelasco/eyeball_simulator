@@ -24,6 +24,8 @@ extern const unsigned char eyelid20[];
 extern const unsigned char eyelid40[];
 extern const unsigned char eyelid60[];
 extern const unsigned char eyelid80[];
+
+
 // packed binary image
 struct PBM
 {
@@ -126,6 +128,21 @@ void make_lid_mask(PBM& image, float percent_open)
   }
 }
 
+// This would have been an array or arrays except we ran into
+// weirdness crossing the dynamic/program memory boundary.
+char* eyelid_frame(int blink_frame)
+{
+	switch(blink_frame)
+  {
+  	case 0: return eyelid80;
+  	case 1: return eyelid60;
+  	case 2: return eyelid40;
+  	case 3: return eyelid20;
+  	case 4: return eyelid40;
+  	case 5: return eyelid60;
+  	case 6: return eyelid80;
+  }
+}
 
 // draw eye to TV buffer
 void draw_eye(PBM& image,
@@ -134,7 +151,7 @@ void draw_eye(PBM& image,
               int horiz,
               int vert,
               float pupil_size,
-              float percent_open)
+              int blink_frame)
 {
   float glint_h_offset = -2.5; // position of eye glint
   float glint_v_offset = -2.5;
@@ -169,7 +186,7 @@ void draw_eye(PBM& image,
  
   // close eye to specified percent  
   //make_lid_mask(temp, percent_open); //comment these out later
-  memcpy_P(temp_data, eyelid40, 22*((22+7)/8));
+  memcpy_P(temp_data, eyelid_frame(blink_frame), 22*((22+7)/8));
  blit(image, temp, temp, 0, 0, 1); //comment these out later
   
 // copy to TV screen
@@ -229,7 +246,7 @@ void loop() {
         vert = vert_position;
         pupil_size = (pupil_value);
         percent_open = 100.f;
-        draw_eye(image, temp, horiz, vert, pupil_size, percent_open);
+        draw_eye(image, temp, horiz, vert, pupil_size, 5);
        //Serial.println(light_value);
         
       }
