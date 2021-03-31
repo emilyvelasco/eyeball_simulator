@@ -16,6 +16,11 @@ static char eyelid1_data[buffer_size];
 extern const unsigned char white_pixel[];
 
 extern const unsigned char black_pixel[];
+
+unsigned long previousMillis = 0;   
+
+const long interval = 1000;  
+
 byte card_x, card_y;
 
 
@@ -30,6 +35,7 @@ extern const unsigned char light[];
 extern const unsigned char blinktext[];
 extern const unsigned char blink_[];
 
+extern const unsigned char eyelid10[];
 extern const unsigned char eyelid20[];
 extern const unsigned char eyelid40[];
 extern const unsigned char eyelid60[];
@@ -149,10 +155,12 @@ char* eyelid_frame(int blink_frame)
     case 2: return eyelid60;
     case 3: return eyelid40;
     case 4: return eyelid20;
-    case 5: return eyelid40;
-    case 6: return eyelid60;
-    case 7: return eyelid80;
-    case 8: return eyelid100;
+    case 5: return eyelid10;
+    case 6: return eyelid20;
+    case 7: return eyelid40;
+    case 8: return eyelid60;
+    case 9: return eyelid80;
+    case 10: return eyelid100;
   }
 }
 
@@ -228,6 +236,7 @@ void setup()  {
 
 
 void loop() {
+  
   const int buttonPin = 4; //the blink button is connected to pin 4 
   pinMode(buttonPin, INPUT);
   // create structures for the working images
@@ -237,18 +246,18 @@ void loop() {
 
   TV.clear_screen();
   TV.bitmap(card_x, card_y, esc);
-  TV.delay(2000);
+  TV.delay(3000);
   TV.clear_screen(); 
 
   TV.clear_screen();
   TV.bitmap(card_x, card_y, atlas);
-  TV.delay(1000);
+  TV.delay(3000);
   TV.clear_screen(); 
 
 
   TV.clear_screen();
   TV.bitmap(card_x, card_y, knowledge);
-  TV.delay(1000);
+  TV.delay(3000);
   TV.clear_screen(); 
 
   TV.clear_screen();
@@ -258,32 +267,32 @@ void loop() {
 
   TV.clear_screen();
   TV.bitmap(card_x, card_y, joytext);
-  TV.delay(3000);
+  TV.delay(5000);
   TV.clear_screen(); 
 
   TV.clear_screen();
   TV.bitmap(card_x, card_y, joystick);
-  TV.delay(1500);
+  TV.delay(3000);
   TV.clear_screen(); 
   
   TV.clear_screen();
   TV.bitmap(card_x, card_y, lighttext);
-  TV.delay(3000);
+  TV.delay(5000);
   TV.clear_screen(); 
 
   TV.clear_screen();
   TV.bitmap(card_x, card_y, light);
-  TV.delay(1500);
+  TV.delay(3000);
   TV.clear_screen(); 
 
   TV.clear_screen();
   TV.bitmap(card_x, card_y, blinktext);
-  TV.delay(3000);
+  TV.delay(5000);
   TV.clear_screen(); 
 
       TV.clear_screen();
   TV.bitmap(card_x, card_y, blink_);
-  TV.delay(1500);
+  TV.delay(3000);
   TV.clear_screen(); 
   
   // the parameters of the eye
@@ -301,12 +310,13 @@ void loop() {
    int light_value = analogRead(A2);
    int blink_state;
    int buttonState = 0;
+   int autoblink = random(0, 1000);
    buttonState = digitalRead(buttonPin);
-   if (buttonState == 0){ 
-   blink_state = 0; //if pin 4 is low (button unpressed), use case 0 (the eye is open)
+   if (buttonState == 1 || autoblink > 970){ 
+   blink_state = 5; //if pin 4 is high (button pressed), use case 5 (the eye is closed)
    }
    else{
-   blink_state = 4; //if pin 4 is high (button pressed), use case 4 (the eye is closed)
+   blink_state = 0; //if pin 4 is low (button unpressed), use case 0 (the eye is open)
    }
    int hor_position = map(hor_value,0,1023,-4,4);
    int vert_position = map(vert_value,0,1023,-4,4);
@@ -439,6 +449,15 @@ PROGMEM const unsigned char peteye[] = {  // 22x34 pixle
 ,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 
 };
+
+PROGMEM const unsigned char eyelid10[] = {
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+   0x7F, 0xFF, 0xF8, 0x7F, 0xFF, 0xF8, 0x00, 0x00, 0x00, 0x00,
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 PROGMEM const unsigned char eyelid20[] = {
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
